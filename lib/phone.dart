@@ -1,40 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Provider/user_provider.dart';
+import '../register.dart';
+import 'constants/icons.dart';
+import 'constants/assets.dart';
+import 'constants/colors.dart';
 
-import 'register.dart';
-
-class PhoneScreen extends StatefulWidget {
+class PhoneScreen extends ConsumerStatefulWidget {
   const PhoneScreen({Key? key}) : super(key: key);
 
   @override
-  _PhoneScreenState createState() => _PhoneScreenState();
+  ConsumerState<PhoneScreen> createState() => _PhoneScreenState();
 }
 
-class _PhoneScreenState extends State<PhoneScreen> {
+class _PhoneScreenState extends ConsumerState<PhoneScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _phoneController.addListener(_checkPhoneNumber);
-  }
-
-  Future<void> submitPhoneNumber(String phoneNumber) async {
-    final url =
-        Uri.parse('https://testenvr2104.cardify.co/api/user/auth/register.php');
-    final response = await http.post(url,
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {'phoneNumber': phoneNumber});
-
-    if (response.statusCode == 200) {
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      // Handle successful response here
-    } else {
-      throw Exception("Invalid phone number");
-      // Handle failure here
-    }
   }
 
   void _checkPhoneNumber() {
@@ -44,13 +30,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
         RegExp(r'^\+?[0-9]{10,15}$').hasMatch(phoneNumber);
 
     if (isValidPhoneNumber) {
-      // Uncomment and adjust as needed
-      submitPhoneNumber(phoneNumber);
+      ref.read(userProvider.notifier).submitPhoneNumber(phoneNumber);
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const RegisterPage()), // Replace with your actual nextPage widget
+        MaterialPageRoute(builder: (context) => const RegisterPage()),
       );
     }
   }
@@ -66,12 +49,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 16, 25, 75),
+        backgroundColor: ColorAssets.primary,
         automaticallyImplyLeading: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SvgPicture.asset("Assets/images/arrow.svg"),
+            SvgPicture.asset(AssetPaths.arrow),
           ],
         ),
       ),
@@ -94,7 +77,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
               ),
               const SizedBox(height: 10),
               const Text(
-                "Start by entering your phone number to re...",
+                "Start by entering your phone number to register",
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 15,
@@ -119,26 +102,26 @@ class _PhoneScreenState extends State<PhoneScreen> {
                 decoration: InputDecoration(
                   prefixIcon: const Padding(
                     padding: EdgeInsets.all(5),
-                    child: Icon(Icons.phone, color: Colors.blue),
+                    child: Icon(IconAssets.phone, color: ColorAssets.secondary),
                   ),
                   hintText: '080 XXX XXX XX',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 20),
+                  hintStyle: const TextStyle(
+                      color: ColorAssets.tertiary, fontSize: 20),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: const BorderSide(color: ColorAssets.tertiary),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: const BorderSide(color: ColorAssets.tertiary),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue),
+                    borderSide: const BorderSide(color: ColorAssets.secondary),
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: ColorAssets.white),
               ),
-              // Add more widgets here if needed
             ],
           ),
         ),
